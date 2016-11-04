@@ -21,10 +21,60 @@ public class CountStepsBlank {
 	 * 
 	 * @return an int representing the number of steps
 	 */
-	private static int countSteps(double[] times, double[][] sensorData) {
-		return 0;
+	public static boolean isPeak(double cur, double mean, double StandardDeviation)
+	{
+		if(cur>(mean+StandardDeviation))
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
 	}
-
+	public static boolean isPeak(double[] sample, int cur)
+	{
+		if(sample[cur]>sample[cur-1]&&sample[cur]<sample[cur+1])
+		{
+			return true;
+		}
+		return false;
+	}
+	public static boolean isTrough(double[] sample, int cur)
+	{
+		if(sample[cur]<sample[cur-1]&&sample[cur]>sample[cur+1])
+		{
+			return true;
+		}
+		return false;
+	}
+	public static int countSteps(double[] times, double[] sample) {
+		double x=calculateMean(sample);
+		double y=calculateStandardDeviation(sample, x);
+		int finalAns=0;
+		double trough=0;
+		double peak=0;
+		for(int i=1; i<(sample.length-1); i++)
+		{
+			if(isTrough(sample, i)&&(peak-sample[i])>(y/2))
+			{
+				trough=sample[i];
+			}
+			if(isPeak(sample, i))
+			{
+				peak=sample[i];
+				if((peak-trough)>(y/2))
+				{
+					finalAns++;
+				}
+			}
+		}
+		return finalAns;
+	}
+	public static int countSteps(double[] times, double[][] sensorData) {
+		double[] sample = calculateMagnitudesFor(sensorData);
+		return countSteps(times, sample);
+	}
 	/***
 	 * Calculate the magnitude for a vector with x, y, and z components.
 	 * 
@@ -73,8 +123,14 @@ public class CountStepsBlank {
 	 *            the mean of the data (must be pre-calculated).
 	 * @return the standard deviation of the data.
 	 */
-	private static double calculateStandardDeviation(double[] arr, double mean) {
-		return 0.0;
+	public static double calculateStandardDeviation(double[] arr, double mean) {
+		double ans=0;
+		for(int i=0; i<arr.length; i++)
+		{
+			ans=ans+(mean-arr[i])*(mean-arr[i]);
+		}
+		ans=ans/arr.length;
+		return Math.sqrt(ans);
 	}
 
 	/***
@@ -84,8 +140,14 @@ public class CountStepsBlank {
 	 *            the array of values
 	 * @return the mean of the data
 	 */
-	private static double calculateMean(double[] arr) {
-		return 0.0;
+	public static double calculateMean(double[] arr) {
+		double ans=0;
+		for(int i=0; i<arr.length; i++)
+		{
+			ans+=arr[i];
+		}
+		ans=ans/arr.length;
+		return ans;
 	}
 
 	public static void displayJFrame(Plot2DPanel plot) {
